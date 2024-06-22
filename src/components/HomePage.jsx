@@ -57,6 +57,18 @@ export default function HomePage(props){
     }
 
 
+    useEffect(() => {
+        if (recordingStatus === 'inactive') {return}
+
+        const interval = setInterval(() => {
+            setDuration(curr => curr + 1)
+        }, 1000)
+
+        return () => clearInterval(interval)
+
+    })
+
+
 
 
 
