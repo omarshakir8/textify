@@ -4,7 +4,7 @@ export default function HomePage(props){
 
     const {setAudioStream, setFile, } = props
 
-    const [recordingStatus, setRecordingState] = useState('inactive')
+    const [recordingStatus, setRecordingStatus] = useState('inactive')
     const [audioChunks, setAudioChunks] = useState([])
     const [duration, setDuration] = useState(0)
 
@@ -28,6 +28,7 @@ export default function HomePage(props){
             console.log(err.message)
             return
         }
+        setRecordingStatus('recording')
 
 
         const media = new MediaRecorder(tempStream, { type: mimType })
@@ -38,6 +39,20 @@ export default function HomePage(props){
         mediaRecorder.current.ondataavailable = (event) =>  {
             if (typeof event.data == 'undefined') { return }
             if (event.data.size === '0') { return }
+            localAudioChunks.push(event.data)
+        }
+        setAudioChunks(localAudioChunks)
+    }
+
+    async function stopRecording() {
+        setRecordingStatus('inactive')
+        console.log('Stop Recording')
+
+        mediaRecorder.current.stop()
+        mediaRecorder.current.onstop = () => {
+            const audioBlob = new Blob(audioChunks, {type: mimeType})
+            setAudioStream(audioBlob)
+            setAudioChunks([])
         }
     }
 
