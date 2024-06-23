@@ -9,7 +9,8 @@ export default function FileDisplay(props) {
       <h1 className= 'font-semibold text-6xl sm:text-7xl md: text-8xl'>Your<span className='text-purple-900 bold'>File</span></h1>
       <div className='mx-auto flex flex-col text-left my-4'>
         <h3 className='font-semibold text-2xl'>Name</h3>
-        <p className='text-2xl'>{file.name}</p>
+        <p className='text-2xl'>{file? file?.name: 
+        'Custom audio'}</p>
         </div>
 
 

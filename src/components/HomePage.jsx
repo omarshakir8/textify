@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from "react"
 
 export default function HomePage(props){
 
-    const {setAudioStream, setFile, } = props
+    const {setAudioStream, setFile } = props
 
     const [recordingStatus, setRecordingStatus] = useState('inactive')
     const [audioChunks, setAudioChunks] = useState([])
@@ -31,14 +31,14 @@ export default function HomePage(props){
         setRecordingStatus('recording')
 
 
-        const media = new MediaRecorder(tempStream, { type: mimType })
+        const media = new MediaRecorder(tempStream, { type: mimeType })
         mediaRecorder.current = media
 
         mediaRecorder.current.start()
         let localAudioChunks = []
         mediaRecorder.current.ondataavailable = (event) =>  {
             if (typeof event.data == 'undefined') { return }
-            if (event.data.size === '0') { return }
+            if (event.data.size === 0) { return }
             localAudioChunks.push(event.data)
         }
         setAudioChunks(localAudioChunks)
@@ -59,7 +59,7 @@ export default function HomePage(props){
 
 
     useEffect(() => {
-        if (recordingStatus === 'inactive') {return}
+        if (recordingStatus === 'inactive') { return }
 
         const interval = setInterval(() => {
             setDuration(curr => curr + 1)
