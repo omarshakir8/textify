@@ -10,7 +10,7 @@ function App() {
   const [file, setFile] = useState(null)
   const [audioStream, setAudioStream] = useState(null)
   const [output, setOutput] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const isAudioAvailable = file || audioStream
 
@@ -25,26 +25,26 @@ function App() {
 
   return (
     <div className='flex flex-col p-4 max-w-[1000px] mx-auto w-full'>
-    <section className='min-h-screen flex flex-col'>
-      <Header />
-      {output ? (
-        <Information />
-      ) : loading ? (
-        <Transcribing />
-      ) : isAudioAvailable ? (
-        <FileDisplay 
-          handleAudioReset={handleAudioReset} 
-          file={file} 
-          audioStream={audioStream} 
-        />
-      ) : (
-        <HomePage setFile={setFile} setAudioStream={setAudioStream} />
-      )}
-    </section>
-    <h1 className='text-black-400'>Omar</h1>
-    <footer></footer>
-  </div>
-);
+      <section className='min-h-screen flex flex-col'>
+        <Header />
+        {output ? (
+          <Information />
+        ) : loading ? (
+          <Transcribing />
+        ) : isAudioAvailable ? (
+          <FileDisplay 
+            handleAudioReset={handleAudioReset} 
+            file={file} 
+            audioStream={audioStream} 
+          />
+        ) : (
+          <HomePage setFile={setFile} setAudioStream={setAudioStream} />
+        )}
+      </section>
+      <h1 className='text-green-400'>hello there!</h1>
+      <footer></footer>
+    </div>
+  );
 };
 
-export default App;
+export default App
