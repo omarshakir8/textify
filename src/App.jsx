@@ -4,6 +4,7 @@ import Header from './components/Header.jsx'
 import FileDisplay from './components/FileDisplay.jsx'
 import Information from './components/Information.jsx'
 import Transcribing from './components/Transcribing.jsx'
+import { MessageTypes } from './utils/presets.js'
 
 
 function App() {
