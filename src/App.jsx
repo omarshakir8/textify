@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import HomePage from './components/HomePage.jsx'
-import Header from './components/Header.jsx'
-import FileDisplay from './components/FileDisplay.jsx'
-import Information from './components/Information.jsx'
-import Transcribing from './components/Transcribing.jsx'
-import { MessageTypes } from './utils/presets.js'
-
+import HomePage from './components/HomePage'
+import Header from './components/Header'
+import FileDisplay from './components/FileDisplay'
+import Information from './components/Information'
+import Transcribing from './components/Transcribing'
+import { MessageTypes } from './utils/presets'
 
 function App() {
   const [file, setFile] = useState(null)
@@ -17,11 +16,10 @@ function App() {
 
   const isAudioAvailable = file || audioStream
 
-  function handleAudioReset(){
+  function handleAudioReset() {
     setFile(null)
     setAudioStream(null)
   }
-
 
   const worker = useRef(null)
 
@@ -32,9 +30,8 @@ function App() {
       })
     }
 
-
-    const onMessageRecieved = async (e) => {
-      switch (e.data.typet) {
+    const onMessageReceived = async (e) => {
+      switch (e.data.type) {
         case 'DOWNLOADING':
           setDownloading(true)
           console.log('DOWNLOADING')
@@ -42,72 +39,62 @@ function App() {
         case 'LOADING':
           setLoading(true)
           console.log('LOADING')
-          break;  
+          break;
         case 'RESULT':
           setOutput(e.data.results)
-          break;  
+          console.log(e.data.results)
+          break;
         case 'INFERENCE_DONE':
           setFinished(true)
-          console.log('DONE')
+          console.log("DONE")
           break;
       }
     }
 
+    worker.current.addEventListener('message', onMessageReceived)
 
-    worker.current.addEventListener('message', onMessageRecieved)
-    return () => worker.current.removeEventListener('message', onMessageRecieved)
-  },)
+    return () => worker.current.removeEventListener('message', onMessageReceived)
+  })
 
-
-
-  async function readAudioFrom(file){
+  async function readAudioFrom(file) {
     const sampling_rate = 16000
-    const audioCTX = newAudioContext({sampleRate: sampling_rate})
+    const audioCTX = new AudioContext({ sampleRate: sampling_rate })
     const response = await file.arrayBuffer()
-    const decode = await audioCTX.decodeAudioData(response)
+    const decoded = await audioCTX.decodeAudioData(response)
     const audio = decoded.getChannelData(0)
     return audio
   }
 
+  async function handleFormSubmission() {
+    if (!file && !audioStream) { return }
 
-  async function handleFormSubmission ()
-{
-  if (!file && !audioStream) {return}
+    let audio = await readAudioFrom(file ? file : audioStream)
+    const model_name = `openai/whisper-tiny.en`
 
-  let audio = await readAudioFrom(file ? file : audioStream)
-  const model_name = 'openai/whisper-tiny.en'
-
-  worker.current.postMessage({
-    type: MessageTypes.INFERENCE_REQUEST,
-    audio,
-    model_name
-
-  })
-}
-
-
+    worker.current.postMessage({
+      type: MessageTypes.INFERENCE_REQUEST,
+      audio,
+      model_name
+    })
+  }
 
   return (
-    <div className='flex flex-col p-4 max-w-[1000px] mx-auto w-full'>
+    <div className='flex flex-col max-w-[1000px] mx-auto w-full'>
       <section className='min-h-screen flex flex-col'>
         <Header />
         {output ? (
-          <Information />
+          <Information output={output} finished={finished}/>
         ) : loading ? (
           <Transcribing />
         ) : isAudioAvailable ? (
-          <FileDisplay 
-            handleAudioReset={handleAudioReset} 
-            file={file} 
-            audioStream={audioStream} 
-          />
+          <FileDisplay handleFormSubmission={handleFormSubmission} handleAudioReset={handleAudioReset} file={file} audioStream={audioStream} />
         ) : (
           <HomePage setFile={setFile} setAudioStream={setAudioStream} />
         )}
       </section>
       <footer></footer>
     </div>
-  );
-};
+  )
+}
 
 export default App
