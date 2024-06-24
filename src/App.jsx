@@ -10,6 +10,7 @@ function App() {
   const [file, setFile] = useState(null)
   const [audioStream, setAudioStream] = useState(null)
   const [output, setOutput] = useState(null)
+  const [downloading, setDownloading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [finished, setFinished] = useState(false)
 
@@ -24,11 +25,37 @@ function App() {
   const worker = useRef(null)
 
   useEffect(() => {
-    if (!worker.worker) {
-    worker.current = new Worker(new URL('./'))
-  }
-},[])
+    if (!worker.current) {
+      worker.current = new Worker(new URL('./utils/whisper.worker.js', import.meta.url), {
+        type: 'module'
+      })
+    }
 
+
+    const onMessageRecieved = async (e) => {
+      switch (e.data.typet) {
+        case 'DOWNLOADING':
+          setDownloading(true)
+          console.log('DOWNLOADING')
+          break;
+        case 'LOADING':
+          setLoading(true)
+          console.log('LOADING')
+          break;  
+        case 'RESULT':
+          setOutput(e.data.results)
+          break;  
+        case 'INFERENCE_DONE':
+          setFinished(true)
+          console.log('DONE')
+          break;
+      }
+    }
+
+
+    worker.current.addEventListener('message', onMessageRecieved)
+    return () => worker.current.removeEventListener('message. onMessageRecieved')
+  }, [])
 
   return (
     <div className='flex flex-col p-4 max-w-[1000px] mx-auto w-full'>
