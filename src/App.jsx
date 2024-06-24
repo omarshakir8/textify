@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import HomePage from './components/HomePage.jsx'
 import Header from './components/Header.jsx'
 import FileDisplay from './components/FileDisplay.jsx'
@@ -9,8 +9,9 @@ import Transcribing from './components/Transcribing.jsx'
 function App() {
   const [file, setFile] = useState(null)
   const [audioStream, setAudioStream] = useState(null)
-  const [output, setOutput] = useState(true)
-  const [loading, setLoading] = useState(true)
+  const [output, setOutput] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [finished, setFinished] = useState(false)
 
   const isAudioAvailable = file || audioStream
 
@@ -19,9 +20,15 @@ function App() {
     setAudioStream(null)
   }
 
+
+  const worker = useRef(null)
+
   useEffect(() => {
-    console.log(audioStream)
-  }, [audioStream])
+    if (!worker.worker) {
+    worker.current = new Worker(new URL('./'))
+  }
+},[])
+
 
   return (
     <div className='flex flex-col p-4 max-w-[1000px] mx-auto w-full'>
@@ -41,7 +48,6 @@ function App() {
           <HomePage setFile={setFile} setAudioStream={setAudioStream} />
         )}
       </section>
-      <h1 className='text-green-400'>hello there!</h1>
       <footer></footer>
     </div>
   );
