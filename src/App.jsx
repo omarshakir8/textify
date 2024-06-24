@@ -69,6 +69,20 @@ function App() {
   }
 
 
+  async function handleFormSubmission ()
+{
+  if (!file && !audioStream) {return}
+
+  let audio = await readAudioFrom(file ? file : audioStream)
+  const model_name = 'openai/whisper-tiny.en'
+
+  worker.current.postMessage({
+    type: MessageTypes.INFERENCE_REQUEST,
+    audio,
+    model_name
+
+  })
+}
 
 
 
